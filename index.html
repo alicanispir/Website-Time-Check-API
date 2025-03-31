@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Time Checker</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            width: 350px;
+        }
+        input {
+            width: 90%;
+            padding: 12px;
+            margin: 10px 0;
+            font-size: 18px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            text-align: center;
+        }
+        button {
+            width: 95%;
+            padding: 12px;
+            font-size: 18px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Check Time in Any City</h2>
+        <h5>Note: If your city's name contains multiple words, please use "_" between them, such as in "America/Los_Angeles."</h5>
+        <form action="/get-time" method="POST">
+            <input type="text" name="city" placeholder="Enter City (e.g., Europe/London)" required>
+            <button type="submit">Get Time</button>
+        </form>
+
+        {% if message %}
+            <p class="error">{{ message }}</p>  <!-- Error message in red -->
+        {% endif %}
+
+        {% if time_info %}
+            <p>{{ time_info }}</p>  <!-- Shows time info if city is valid -->
+        {% endif %}
+    </div>
+    <script>
+        function fetchTime() {
+            const city = document.getElementById("city").value;
+            fetch(`/time/${city}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById("result").innerHTML = "City not found or API error.";
+                    } else {
+                        document.getElementById("result").innerHTML =
+                            `<h2>Time: ${data.time}</h2>
+                             <p>Timezone: ${data.timezone}</p>`;
+                    }
+                })
+                .catch(error => {
+                    console.error("Fetch error:", error);
+                    document.getElementById("result").innerHTML = "Error fetching data.";
+                });
+        }
+    </script>
+</body>
+</html>
